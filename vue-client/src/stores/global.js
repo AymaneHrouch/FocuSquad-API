@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref} from "vue";
 
 export const useGlobalStore = defineStore("global", () => {
   const showChat = ref(false);
@@ -12,6 +12,8 @@ export const useGlobalStore = defineStore("global", () => {
   const toggleSettings = () => {
     showSettings.value = !showSettings.value;
   };
+
+
   return {
     showChat,
     showSettings,

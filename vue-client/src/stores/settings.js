@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 export const useSettingsStore = defineStore("settings", () => {
   const username = ref(localStorage.getItem("username") || "Someone");
