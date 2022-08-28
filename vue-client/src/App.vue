@@ -25,6 +25,15 @@ function formatTime(totalSeconds) {
   const padTo2Digits = (num) => num.toString().padStart(2, "0");
   return `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
 }
+
+onMounted(() => {
+  globalStore.socket.on("roomSettings", ({ session, shortBreak, longBreak }) => {
+    console.log("roomSettings", { session, shortBreak, longBreak });
+    settingsStore.session = session;
+    settingsStore.shortBreak = shortBreak;
+    settingsStore.longBreak = longBreak;
+  });
+});
 </script>
 
 <style>

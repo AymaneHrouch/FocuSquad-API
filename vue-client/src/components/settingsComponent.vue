@@ -53,6 +53,8 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
+
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
 

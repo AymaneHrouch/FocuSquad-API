@@ -31,21 +31,31 @@
       </div>
     </div>
     <div class="users">
-      <span class="user">{{ settingsStore.username }}</span>
-      <span class="user">aymane</span>
-      <span class="user">aymane</span>
+      <span class="user" v-for="user in data.users">{{ user.username }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import { reactive, onMounted } from "vue";
+
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
 import { useTimerStore } from "@s/timer";
 
+let data = reactive({
+  users: [],
+});
+
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
 const timerStore = useTimerStore();
+
+onMounted(() => {
+  globalStore.socket.on("roomUsers", ({ users: newUsers }) => {
+    data.users = newUsers;
+  });
+});
 </script>
 
 <style>

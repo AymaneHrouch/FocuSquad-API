@@ -7,14 +7,15 @@
           v-for="message in messages"
         >
           <div class="message-sender" v-if="message.username">{{ message.username }}</div>
-          <p class="message-text" :title="message.time">
-            {{ message.text }}
+          <p class="message-text" :title="message.time"></p>
+          <p v-for="paragraph in message.text.split(`\n`)">
+            {{ paragraph }}
           </p>
         </div>
       </main>
       <div class="chat-form-container">
-        <form ref="chatForm" name="chatForm" id="chat-form" @submit="handleSubmit">
-          <input id="msg" type="text" placeholder="Aa" required autocomplete="off" />
+        <form name="chatForm" id="chat-form" @submit="handleSubmit">
+          <input ref="messageInput" id="msg" type="text" placeholder="Aa" required autocomplete="off" />
           <span id="submit-btn" class="svg-icon" @click="handleSubmit"></span>
         </form>
       </div>
@@ -23,7 +24,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
@@ -32,6 +33,8 @@ import { useTimerStore } from "@s/timer";
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
 const timerStore = useTimerStore();
+
+const messageInput = ref(null);
 
 let messages = reactive([]);
 
@@ -42,12 +45,12 @@ const handleSubmit = (e) => {
   // Append the message to the messages array
   time = time.split(":").splice(0, 2).join(":") + " " + time.split(" ")[1].toLowerCase();
   messages.push({
-    text: e.target.msg.value,
+    text: messageInput.value.value,
     time,
   });
 
   // Send message to server
-  globalStore.socket.emit("chatMessage", e.target.msg.value);
+  globalStore.socket.emit("chatMessage", messageInput.value.value);
 
   // Clear the input field
   e.target.msg.value = "";
@@ -68,6 +71,7 @@ onMounted(() => {
 <style>
 #chat {
   /* background-color: red; */
+  padding-top: 1rem;
   width: 40%;
   height: 100%;
   font-family: "Hind Siliguri", sans-serif;

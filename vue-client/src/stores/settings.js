@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { ref, watch } from "vue";
+import { ref } from "vue";
+import { useGlobalStore } from "./global";
 
 export const useSettingsStore = defineStore("settings", () => {
   const username = ref(localStorage.getItem("username") || "Someone");
@@ -25,6 +26,13 @@ export const useSettingsStore = defineStore("settings", () => {
     if (shortBreak < 1) return { error: "Short break length must be at least 1 minute" };
     if (longBreak < 1) return { error: "Long break length must be at least 1 minute" };
 
+    const globalStore = useGlobalStore();
+    globalStore.socket.emit("settings", {
+      username,
+      session,
+      shortBreak,
+      longBreak,
+    });
     return { ok: true };
   };
 

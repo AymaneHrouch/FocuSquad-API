@@ -1,3 +1,5 @@
+const { formatMessage } = require("../utils/messages");
+
 const users = [];
 
 // Get All users
@@ -14,12 +16,24 @@ function userJoin(id, username, room) {
 
 // Get current user
 function getCurrentUser(id) {
-  return users.find(user => user.id === id);
+  return users.find((user) => user.id === id);
+}
+
+// Rename current user
+function renameUser(io, id, username) {
+  const user = getCurrentUser(id);
+  if (user.username !== username) {
+    user.username = username;
+    io.to(user.room).emit(
+      "message",
+      formatMessage("🥰", `(${user.username})has changed their name to (${username})`)
+    );
+  }
 }
 
 // User leaves chat
 function userLeave(id) {
-  const index = users.findIndex(user => user.id === id);
+  const index = users.findIndex((user) => user.id === id);
   if (index !== -1) {
     return users.splice(index, 1)[0];
   }
@@ -27,13 +41,14 @@ function userLeave(id) {
 
 // Get room users
 function getRoomUsers(room) {
-  return users.filter(user => user.room === room);
+  return users.filter((user) => user.room === room);
 }
 
 module.exports = {
   userJoin,
   getCurrentUser,
+  renameUser,
   userLeave,
   getRoomUsers,
-  getUsers
+  getUsers,
 };
