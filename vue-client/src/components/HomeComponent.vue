@@ -1,20 +1,20 @@
 <template>
-  <div id="config" v-if="resting">
+  <div id="config" v-if="timerStore.resting">
     <span
-      @click="toggleChat"
+      @click="globalStore.toggleChat"
       class="chat-icon"
-      :title="`${showChat ? `Hide` : `Show`} Chat`"
+      :title="`${globalStore.showChat ? `Hide` : `Show`} Chat`"
     ></span>
     <span
-      @click="toggleSettings"
+      @click="globalStore.toggleSettings"
       class="settings-icon"
-      :title="`${showSettings ? `Hide` : `Open`} Settings`"
+      :title="`${globalStore.showSettings ? `Hide` : `Open`} Settings`"
     ></span>
   </div>
   <Transition name="settings">
-    <div class="modal-wraper" v-if="showSettings">
+    <div class="modal-wraper" v-if="globalStore.showSettings">
       <div class="settings-modal">
-        <span class="close-btn" @click="showSettings = false">&times;</span>
+        <span class="close-btn" @click="globalStore.showSettings = false">&times;</span>
         <h2 class="modal-heading">Settings</h2>
         <div class="setting-option">
           <label for="long-break">Username</label>
@@ -45,31 +45,44 @@
     </div>
   </Transition>
   <div id="timer">
-    <div class="timer-options" v-if="stopped">
-      <span class="timer-option">Long Break (20min)</span>
-      <span class="timer-option">Short Break (10min)</span>
-      <span class="timer-option" @click="stopped = false; resting = false;">Session (120min)</span>
+    <div class="timer-options" v-if="timerStore.stopped">
+      <span class="timer-option">Long Break ({{ settingsStore.longBreak }}min)</span>
+      <span class="timer-option">Short Break ({{ settingsStore.shortBreak }}min)</span>
+      <span
+        class="timer-option"
+        @click="
+          timerStore.stopped = false;
+          timerStore.resting = false;
+        "
+        >Session ({{ settingsStore.session }}min)</span
+      >
     </div>
     <div class="countdown" v-else>
-      <p class="quote">Don't let yesterday take up too much of today.</p>
-      <div class="time animate__animated" :class="myClass">28:16</div>
-      <div class="controls" v-if="paused">
+      <p class="quote">{{ settingsStore.quote }}</p>
+      <div class="time animate__animated" :class="timerStore.timerClass">28:16</div>
+      <div class="controls" v-if="timerStore.paused">
         <span @click="resume">resume</span>
         <span>reset</span>
-        <span @click="stopped = true; resting = true">stop</span>
+        <span
+          @click="
+            timerStore.stopped = true;
+            timerStore.resting = true;
+          "
+          >stop</span
+        >
       </div>
       <div class="controls" v-else>
-        <span @click="pause">pause</span>
+        <span @click="timerStore.pause">pause</span>
       </div>
     </div>
     <div class="users">
-      <span class="user">aymane</span>
+      <span class="user">{{ settingsStore.username }}</span>
       <span class="user">aymane</span>
       <span class="user">aymane</span>
     </div>
   </div>
   <Transition name="chat">
-    <div id="chat" v-if="showChat && resting">
+    <div id="chat" v-if="globalStore.showChat && timerStore.resting">
       <main class="chat-main">
         <div class="message message-incoming">
           <div class="message-sender">Aymane</div>
@@ -146,57 +159,33 @@
 </template>
 
 <script>
+import { useGlobalStore } from "@s/global";
+import { useSettingsStore } from "@s/settings";
+import { useTimerStore } from "@s/timer";
+import { onMounted } from "vue";
+
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const padTo2Digits = (num) => num.toString().padStart(2, "0");
+  return `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
+}
+
 export default {
   name: "HomeComponent",
   setup() {
-    
-  },
-  data() {
-    return {
-      value: 15,
-      paused: true,
-      stopped: false,
-      myClass: !this.paused ? "animate__heartBeat" : "",
-      showChat: false,
-      showSettings: true,
-      resting: true,
-    };
+    const settingsStore = useSettingsStore();
+    const globalStore = useGlobalStore();
+    const timerStore = useTimerStore();
+
+    return { settingsStore, globalStore, timerStore };
   },
   mounted() {
     // this.$refs.chatForm.addEventListener("submit", (e) => {
     //   e.preventDefault();
     //   this.sendMessage();
     // });
-
-    const totalSeconds = 122;
-    console.log(this.formatTime(totalSeconds));
-  },
-  methods: {
-    pause() {
-      this.paused = true;
-      this.myClass = "";
-    },
-    resume() {
-      this.paused = false;
-      this.myClass = "animate__heartBeat";
-    },
-    submit() {},
-    sendMessage() {
-      console.log("send message");
-    },
-    toggleChat() {
-      this.showChat = !this.showChat;
-    },
-    toggleSettings() {
-      this.showSettings = !this.showSettings;
-    },
-    formatTime(totalSeconds) {
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      const padTo2Digits = (num) => num.toString().padStart(2, "0");
-      return `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
-    },
-  },
+  }
 };
 </script>
 

@@ -8,6 +8,7 @@ module.exports = defineConfig({
       alias: {
         "@": path.resolve(__dirname, "src"),
         "@c": path.resolve(__dirname, "src/components"),
+        "@s": path.resolve(__dirname, "src/stores"),
       },
     },
   },
