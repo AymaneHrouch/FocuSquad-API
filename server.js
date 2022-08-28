@@ -13,6 +13,7 @@ const usersHandler = require("./socketsHandlers/usersHandler");
 const messagesHandler = require("./socketsHandlers/messagesHandler");
 
 const onConnection = socket => {
+  console.log("new connection");
   usersHandler(io, socket);
   countdownHandler(io, socket);
   messagesHandler(io, socket);
