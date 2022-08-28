@@ -1,3 +1,4 @@
+const { formatMessage } = require("../utils/messages");
 const { userJoin, getRoomUsers, userLeave } = require("../utils/users");
 
 module.exports = function (io, socket) {
@@ -11,6 +12,9 @@ module.exports = function (io, socket) {
     io.to(user.room).emit("roomUsers", {
       users: getRoomUsers(user.room),
     });
+
+    // Send welcome message
+    io.to(user.room).emit("message", formatMessage("🥰", `${user.username} has joined the chat`));
 
     socket.on("disconnect", () => {
       const user = userLeave(socket.id);
