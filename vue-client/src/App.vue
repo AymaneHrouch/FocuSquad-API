@@ -6,10 +6,18 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
+
 import ChatComponent from "@c/ChatComponent.vue";
 import TimerComponent from "@c/TimerComponent.vue";
 import SettingsComponent from "@c/settingsComponent.vue";
 import TogglersComponent from "@c/TogglersComponent.vue";
+
+import { useGlobalStore } from "@s/global";
+import { useSettingsStore } from "@s/settings";
+
+const globalStore = useGlobalStore();
+const settingsStore = useSettingsStore();
 
 function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);

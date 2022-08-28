@@ -1,8 +1,16 @@
 import { defineStore } from "pinia";
-import { ref} from "vue";
+import { ref } from "vue";
+import { io } from "socket.io-client";
 
 export const useGlobalStore = defineStore("global", () => {
-  const showChat = ref(false);
+  // Global socket
+  const socket = io("http://localhost:5000", {
+    transports: ["websocket"],
+  });
+
+  const room = location.pathname.substring(1);
+
+  const showChat = ref(true);
   const showSettings = ref(false);
 
   const toggleChat = () => {
@@ -13,8 +21,9 @@ export const useGlobalStore = defineStore("global", () => {
     showSettings.value = !showSettings.value;
   };
 
-
   return {
+    socket,
+    room,
     showChat,
     showSettings,
     toggleChat,
