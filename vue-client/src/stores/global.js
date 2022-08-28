@@ -10,7 +10,7 @@ export const useGlobalStore = defineStore("global", () => {
 
   const room = location.pathname.substring(1);
 
-  const showChat = ref(false);
+  const showChat = ref(true);
   const showSettings = ref(false);
 
   const toggleChat = () => {

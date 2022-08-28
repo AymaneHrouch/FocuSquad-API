@@ -7,15 +7,22 @@
           v-for="message in messages"
         >
           <div class="message-sender" v-if="message.username">{{ message.username }}</div>
-          <p class="message-text" :title="message.time"></p>
-          <p v-for="paragraph in message.text.split(`\n`)">
+          <p class="message-text"></p>
+          <p v-for="paragraph in message.text.split(`\n`)" :title="message.time">
             {{ paragraph }}
           </p>
         </div>
       </main>
       <div class="chat-form-container">
         <form name="chatForm" id="chat-form" @submit="handleSubmit">
-          <input ref="messageInput" id="msg" type="text" placeholder="Aa" required autocomplete="off" />
+          <input
+            ref="messageInput"
+            id="msg"
+            type="text"
+            placeholder="Aa"
+            required
+            autocomplete="off"
+          />
           <span id="submit-btn" class="svg-icon" @click="handleSubmit"></span>
         </form>
       </div>
@@ -40,10 +47,11 @@ let messages = reactive([]);
 
 const handleSubmit = (e) => {
   if (e) e.preventDefault();
-  let time = new Date().toLocaleTimeString();
 
-  // Append the message to the messages array
+  // Format time hh:mm a
+  let time = new Date().toLocaleTimeString();
   time = time.split(":").splice(0, 2).join(":") + " " + time.split(" ")[1].toLowerCase();
+  // Append the message to the messages array
   messages.push({
     text: messageInput.value.value,
     time,
@@ -63,6 +71,7 @@ onMounted(() => {
   });
 
   globalStore.socket.on("message", (msg) => {
+    console.log("new message", msg);
     messages.push(msg);
   });
 });
@@ -168,10 +177,10 @@ onMounted(() => {
 
 /** Chat animation */
 .chat-enter-active {
-  animation: bounceInRight 1s;
+  animation: bounceInRight 0.5s;
 }
 
 .chat-leave-active {
-  animation: bounceOutRight 1s;
+  animation: bounceOutRight 0.5s;
 }
 </style>

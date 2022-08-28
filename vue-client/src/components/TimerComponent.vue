@@ -1,33 +1,28 @@
 <template>
   <div id="timer">
     <div class="timer-options not-selectable" v-if="timerStore.stopped">
-      <span class="timer-option">Long Break ({{ settingsStore.longBreak }}min)</span>
-      <span class="timer-option">Short Break ({{ settingsStore.shortBreak }}min)</span>
-      <span
-        class="timer-option"
-        @click="
-          timerStore.stopped = false;
-          timerStore.resting = false;
-        "
-        >Session ({{ settingsStore.session }}min)</span
+      <span class="timer-option" @click="startLongBreak"
+        >Long Break ({{ settingsStore.longBreak / 60 }}min)</span
+      >
+      <span class="timer-option" @click="startShortBreak"
+        >Short Break ({{ settingsStore.shortBreak / 60 }}min)</span
+      >
+      <span class="timer-option" @click="startSession"
+        >Session ({{ settingsStore.session / 60 }}min)</span
       >
     </div>
     <div class="countdown" v-else>
       <p class="quote">{{ settingsStore.quote }}</p>
-      <div class="time animate__animated not-selectable" :class="timerStore.timerClass">28:16</div>
+      <div class="time animate__animated animate__backInRight not-selectable">
+        {{ formatTime(count) }}
+      </div>
       <div class="controls not-selectable" v-if="timerStore.paused">
         <span @click="resume">resume</span>
-        <span>reset</span>
-        <span
-          @click="
-            timerStore.stopped = true;
-            timerStore.resting = true;
-          "
-          >stop</span
-        >
+        <span @click="reset">reset</span>
+        <span @click="stop">stop</span>
       </div>
       <div class="controls not-selectable" v-else>
-        <span @click="timerStore.pause">pause</span>
+        <span @click="pause">pause</span>
       </div>
     </div>
     <div class="users">
@@ -37,15 +32,78 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, ref } from "vue";
 
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
 import { useTimerStore } from "@s/timer";
+import { formatTime } from "@/utils/formatTime";
 
 let data = reactive({
   users: [],
 });
+
+const count = ref(0);
+const tempCount = ref(0);
+
+const startSession = async () => {
+  count.value = settingsStore.session;
+  timerStore.resting = false;
+  if (globalStore.showChat) {
+    // Sleep for 1 second to allow the chat to disappear
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  timerStore.stopped = false;
+  timerStore.paused = false;
+  globalStore.socket.emit("startCountdown", {
+    room: globalStore.room,
+    duration: count.value,
+  });
+};
+
+const startLongBreak = () => {
+  (count.value = settingsStore.longBreak), (timerStore.stopped = false);
+  timerStore.resting = true;
+  timerStore.paused = false;
+  globalStore.socket.emit("startCountdown", {
+    room: globalStore.room,
+    duration: count.value,
+  });
+};
+
+const startShortBreak = () => {
+  count.value = settingsStore.shortBreak;
+  timerStore.stopped = false;
+  timerStore.resting = true;
+  timerStore.paused = false;
+  globalStore.socket.emit("startCountdown", {
+    room: globalStore.room,
+    duration: count.value,
+  });
+};
+
+const pause = () => {
+  timerStore.paused = true;
+  globalStore.socket.emit("stopCountdown", { room: globalStore.room });
+  tempCount.value = count.value;
+};
+
+const resume = () => {
+  timerStore.paused = false;
+  globalStore.socket.emit("startCountdown", { room: globalStore.room, duration: count.value });
+};
+
+const reset = () => {
+  timerStore.paused = false;
+  globalStore.socket.emit("startCountdown", { room: globalStore.room, duration: 100 });
+};
+
+const stop = () => {
+  timerStore.stopped = true;
+  timerStore.paused = true;
+  timerStore.resting = true;
+  globalStore.socket.emit("stopCountdown", { room: globalStore.room });
+};
 
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
@@ -54,6 +112,16 @@ const timerStore = useTimerStore();
 onMounted(() => {
   globalStore.socket.on("roomUsers", ({ users: newUsers }) => {
     data.users = newUsers;
+  });
+
+  globalStore.socket.on("countdown", (newCount) => {
+    count.value = newCount;
+    if (count.value === 0) {
+      timerStore.stopped = true;
+      timerStore.paused = true;
+      timerStore.resting = true;
+      alert("Time's up!");
+    }
   });
 });
 </script>

@@ -27,7 +27,7 @@ function renameUser(io, id, username) {
     user.username = username;
     io.to(user.room).emit(
       "message",
-      formatMessage("🥰", `(${oldUsername})has changed their name to (${username})`)
+      formatMessage("🥰", `(${oldUsername}) has changed their name to (${username})`)
     );
   }
 }

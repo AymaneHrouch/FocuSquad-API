@@ -37,9 +37,9 @@ module.exports = function (io, socket) {
           formatMessage(
             "🥰",
             `(${user.username}) has updated the settings:
-          ${session ? `*Session: ${session} minutes\n` : ""}
-          ${shortBreak ? `*Short Break: ${shortBreak} minutes\n` : ""}
-          ${longBreak ? `*Long Break: ${longBreak} minutes\n` : ""}`
+          ${session ? `*Session: ${session / 60} minutes\n` : ""}
+          ${shortBreak ? `*Short Break: ${shortBreak / 60} minutes\n` : ""}
+          ${longBreak ? `*Long Break: ${longBreak / 60} minutes\n` : ""}`
           )
         );
       }

@@ -21,7 +21,7 @@
             id="session-input"
             min="1"
             max="120"
-            :value="settingsStore.session"
+            :value="settingsStore.session / 60"
           />
         </div>
 
@@ -32,7 +32,7 @@
             id="short-break-input"
             min="1"
             max="120"
-            :value="settingsStore.shortBreak"
+            :value="settingsStore.shortBreak / 60"
           />
         </div>
 
@@ -43,7 +43,7 @@
             id="long-break-input"
             min="1"
             max="120"
-            :value="settingsStore.longBreak"
+            :value="settingsStore.longBreak / 60"
           />
         </div>
         <span class="ok-btn not-selectable" @click="submit">OK</span>
@@ -53,8 +53,6 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
-
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
 

@@ -13,7 +13,7 @@ function startCountdown(io, room, duration) {
     if (count < 0) {
       stopCountdown(room);
     }
-  }, 100);
+  }, 1000);
   countdowns.push({ room, interval });
 }
 
