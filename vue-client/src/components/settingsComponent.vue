@@ -1,34 +1,52 @@
 <template>
-  <Transition name="settings">
-    <div class="modal-wraper" v-if="globalStore.showSettings">
+  <Transition name="settings" v-if="globalStore.showSettings">
+    <div class="modal-wraper">
       <div class="settings-modal">
         <span class="close-btn" @click="globalStore.showSettings = false">&times;</span>
         <h2 class="modal-heading">Settings</h2>
         <div class="setting-option">
           <label for="long-break">Username</label>
-          <input type="text" id="username-input" />
+          <input type="text" id="username-input" :value="settingsStore.username" />
         </div>
 
         <div class="setting-option">
           <label for="long-break">Quote</label>
-          <input type="text" id="username-input" v-model="settingsStore.quote" />
+          <input type="text" id="quote-input" :value="settingsStore.quote" />
         </div>
 
         <div class="setting-option">
-          <label for="long-break">Session</label>
-          <input type="number" id="session-input" min="1" max="120" />
+          <label for="session-input">Session</label>
+          <input
+            type="number"
+            id="session-input"
+            min="1"
+            max="120"
+            :value="settingsStore.session"
+          />
         </div>
 
         <div class="setting-option">
-          <label for="long-break">Short Break</label>
-          <input type="number" id="short-break-input" min="1" max="120" />
+          <label for="short-break-input">Short Break</label>
+          <input
+            type="number"
+            id="short-break-input"
+            min="1"
+            max="120"
+            :value="settingsStore.shortBreak"
+          />
         </div>
 
         <div class="setting-option">
-          <label for="long-break">Long Break</label>
-          <input type="number" id="long-break-input" min="1" max="120" />
+          <label for="long-break-input">Long Break</label>
+          <input
+            type="number"
+            id="long-break-input"
+            min="1"
+            max="120"
+            :value="settingsStore.longBreak"
+          />
         </div>
-        <span class="ok-btn not-selectable">OK</span>
+        <span class="ok-btn not-selectable" @click="submit">OK</span>
       </div>
     </div>
   </Transition>
@@ -37,12 +55,23 @@
 <script setup>
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
-import { useTimerStore } from "@s/timer";
 
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
-const timerStore = useTimerStore();
 
+const submit = () => {
+  const username = document.getElementById("username-input").value;
+  const quote = document.getElementById("quote-input").value;
+  const session = document.getElementById("session-input").value;
+  const shortBreak = document.getElementById("short-break-input").value;
+  const longBreak = document.getElementById("long-break-input").value;
+  const res = settingsStore.updateSettings(username, quote, session, shortBreak, longBreak);
+  if (res.error) {
+    alert(res.error);
+  } else {
+    globalStore.showSettings = false;
+  }
+};
 </script>
 
 <style>
