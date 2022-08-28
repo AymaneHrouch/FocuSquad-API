@@ -5,12 +5,12 @@
         <span class="close-btn" @click="globalStore.showSettings = false">&times;</span>
         <h2 class="modal-heading">Settings</h2>
         <div class="setting-option">
-          <label for="long-break">Username</label>
+          <label for="username-input">Username</label>
           <input type="text" id="username-input" :value="settingsStore.username" />
         </div>
 
         <div class="setting-option">
-          <label for="long-break">Quote</label>
+          <label for="quote-input" title="Only you can see it">You Personal Quote</label>
           <input type="text" id="quote-input" :value="settingsStore.quote" />
         </div>
 
@@ -104,13 +104,8 @@ const submit = () => {
 .settings-modal {
   background-color: var(--primary-color);
   position: absolute;
-  /* top: 50%;
-    left: 50%;
-    transform: translate(-50
-    width: 20rem;
-    border-radius: 0.5rem;%, -50%) !important; */
   height: auto;
-  width: 20rem;
+  width: 25rem;
   border-radius: 0.5rem;
   padding: 1rem;
   color: #000;

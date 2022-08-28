@@ -53,7 +53,7 @@ const handleSubmit = (e) => {
   globalStore.socket.emit("chatMessage", messageInput.value.value);
 
   // Clear the input field
-  e.target.msg.value = "";
+  messageInput.value.value = "";
 };
 
 onMounted(() => {

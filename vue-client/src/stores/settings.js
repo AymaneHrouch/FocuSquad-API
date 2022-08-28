@@ -11,6 +11,8 @@ export const useSettingsStore = defineStore("settings", () => {
   const shortBreak = ref(localStorage.getItem("shortBreak") || 5);
   const longBreak = ref(localStorage.getItem("longBreak") || 20);
 
+  const globalStore = useGlobalStore();
+
   const validate = (username, quote, session, shortBreak, longBreak) => {
     if (!username) return { error: "Please enter a username" };
     if (!quote) return { error: "Please enter a quote" };
@@ -25,20 +27,21 @@ export const useSettingsStore = defineStore("settings", () => {
     if (session < 1) return { error: "Session length must be at least 1 minute" };
     if (shortBreak < 1) return { error: "Short break length must be at least 1 minute" };
     if (longBreak < 1) return { error: "Long break length must be at least 1 minute" };
-
-    const globalStore = useGlobalStore();
-    globalStore.socket.emit("settings", {
-      username,
-      session,
-      shortBreak,
-      longBreak,
-    });
     return { ok: true };
   };
 
   const updateSettings = (newUsername, newQuote, newSession, newShortBreak, newLongBreak) => {
     const validation = validate(newUsername, newQuote, newSession, newShortBreak, newLongBreak);
     if (validation.error) return { error: validation.error };
+
+
+    // Send setttings to the server
+    globalStore.socket.emit("settings", {
+      username: newUsername.trim(),
+      session: session.value === newSession ? null : newSession,
+      shortBreak: shortBreak.value === newShortBreak ? null : newShortBreak,
+      longBreak: longBreak.value === newLongBreak ? null : newLongBreak,
+    });
 
     username.value = newUsername;
     quote.value = newQuote;

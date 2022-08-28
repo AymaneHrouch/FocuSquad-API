@@ -22,11 +22,12 @@ function getCurrentUser(id) {
 // Rename current user
 function renameUser(io, id, username) {
   const user = getCurrentUser(id);
+  const oldUsername = user.username
   if (user.username !== username) {
     user.username = username;
     io.to(user.room).emit(
       "message",
-      formatMessage("🥰", `(${user.username})has changed their name to (${username})`)
+      formatMessage("🥰", `(${oldUsername})has changed their name to (${username})`)
     );
   }
 }

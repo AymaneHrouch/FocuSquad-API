@@ -24,22 +24,25 @@ module.exports = function (io, socket) {
     socket.on("settings", ({ username, session, shortBreak, longBreak }) => {
       renameUser(io, socket.id, username);
       const user = getCurrentUser(socket.id);
-      io.to(user.room).emit("roomSettings", {
-        session,
-        shortBreak,
-        longBreak,
-      });
-      io.to(user.room).emit(
-        "message",
-        formatMessage(
-          "🥰",
-          `(${user.username}) has updated the settings
-        *Session: ${session} minutes\n
-        *Short Break: ${shortBreak} minutes\n
-        *Long Break: ${longBreak} minutes`
-        )
-      );
       sendRoomUsers(user);
+      if (session || shortBreak || longBreak) {
+        io.to(user.room).emit("roomSettings", {
+          session,
+          shortBreak,
+          longBreak,
+        });
+
+        io.to(user.room).emit(
+          "message",
+          formatMessage(
+            "🥰",
+            `(${user.username}) has updated the settings:
+          ${session ? `*Session: ${session} minutes\n` : ""}
+          ${shortBreak ? `*Short Break: ${shortBreak} minutes\n` : ""}
+          ${longBreak ? `*Long Break: ${longBreak} minutes\n` : ""}`
+          )
+        );
+      }
     });
 
     socket.on("disconnect", () => {

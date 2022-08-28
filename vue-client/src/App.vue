@@ -29,9 +29,9 @@ function formatTime(totalSeconds) {
 onMounted(() => {
   globalStore.socket.on("roomSettings", ({ session, shortBreak, longBreak }) => {
     console.log("roomSettings", { session, shortBreak, longBreak });
-    settingsStore.session = session;
-    settingsStore.shortBreak = shortBreak;
-    settingsStore.longBreak = longBreak;
+    settingsStore.session = session || settingsStore.session;
+    settingsStore.shortBreak = shortBreak || settingsStore.shortBreak;
+    settingsStore.longBreak = longBreak || settingsStore.longBreak;
   });
 });
 </script>
