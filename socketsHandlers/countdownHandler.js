@@ -2,8 +2,8 @@ const { getCurrentUser } = require("../utils/users");
 const { startCountdown, stopCountdown } = require("../utils/countdowns");
 module.exports = function (io, socket) {
   // Start countdown
-  socket.on("startCountdown", ({ room, duration }) => {
-    startCountdown(io, room, duration);
+  socket.on("startCountdown", ({ room, duration, rest }) => {
+    startCountdown(io, room, duration, rest);
   });
 
   // Stop countdown

@@ -8,7 +8,7 @@ export const useGlobalStore = defineStore("global", () => {
     transports: ["websocket"],
   });
 
-  const room = location.pathname.substring(1);
+  const room = new URLSearchParams(location.search).get("room");
 
   const showChat = ref(true);
   const showSettings = ref(false);

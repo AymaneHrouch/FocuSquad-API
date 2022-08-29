@@ -7,8 +7,11 @@
           v-for="message in messages"
         >
           <div class="message-sender" v-if="message.username">{{ message.username }}</div>
-          <p class="message-text"></p>
-          <p v-for="paragraph in message.text.split(`\n`)" :title="message.time">
+          <p
+            class="message-text"
+            v-for="paragraph in message.text.split(`\n`)"
+            :title="message.time"
+          >
             {{ paragraph }}
           </p>
         </div>
@@ -23,7 +26,12 @@
             required
             autocomplete="off"
           />
-          <span id="submit-btn" class="svg-icon" @click="handleSubmit"></span>
+          <span
+            id="submit-btn"
+            class="svg-icon"
+            @click="handleSubmit"
+            @touchend="handleSubmit"
+          ></span>
         </form>
       </div>
     </div>
@@ -31,7 +39,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, nextTick } from "vue";
 
 import { useGlobalStore } from "@s/global";
 import { useSettingsStore } from "@s/settings";
@@ -45,7 +53,7 @@ const messageInput = ref(null);
 
 let messages = reactive([]);
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   if (e) e.preventDefault();
 
   // Format time hh:mm a
@@ -56,6 +64,12 @@ const handleSubmit = (e) => {
     text: messageInput.value.value,
     time,
   });
+
+  await nextTick();
+
+  // Scroll to the bottom of the chat window
+  const chat = document.querySelector("#chat .chat-main");
+  chat.scrollTo(0, chat.scrollHeight);
 
   // Send message to server
   globalStore.socket.emit("chatMessage", messageInput.value.value);
@@ -73,6 +87,10 @@ onMounted(() => {
   globalStore.socket.on("message", (msg) => {
     console.log("new message", msg);
     messages.push(msg);
+
+    // Scroll to the bottom of the chat
+    const chat = document.querySelector("#chat .chat-main");
+    chat.scrollTo(0, chat.scrollHeight)
   });
 });
 </script>
@@ -100,6 +118,7 @@ onMounted(() => {
   flex-direction: column;
   overflow: scroll;
   overflow-x: hidden;
+  height: 100%;
 }
 
 /** Scrollbar */
@@ -124,6 +143,7 @@ onMounted(() => {
   margin-bottom: 0.5rem;
   padding: 0.5rem 0.7rem;
   border-radius: 0.5rem;
+  word-wrap: break-word;
 }
 
 .message-outgoing {

@@ -1,13 +1,13 @@
 const countdowns = [];
 
 function getCountdown(room) {
-  return countdowns.find(countdown => countdown.room === room);
+  return countdowns.find((countdown) => countdown.room === room);
 }
 
-function startCountdown(io, room, duration) {
+function startCountdown(io, room, duration, rest) {
   let count = duration;
   interval = setInterval(() => {
-    io.to(room).emit("countdown", count);
+    io.to(room).emit("countdown", { count, rest });
     count--;
 
     if (count < 0) {
@@ -20,7 +20,7 @@ function startCountdown(io, room, duration) {
 function stopCountdown(room) {
   const countdown = getCountdown(room);
   if (!countdown) return console.log("Countdown not found");
-  const index = countdowns.findIndex(c => c.room === room);
+  const index = countdowns.findIndex((c) => c.room === room);
   if (index !== -1) {
     countdowns.splice(index, 1)[0];
     clearInterval(countdown.interval);

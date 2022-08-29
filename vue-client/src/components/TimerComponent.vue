@@ -45,8 +45,12 @@ let data = reactive({
 
 const count = ref(0);
 const tempCount = ref(0);
+const tempDuration = ref(0);
+
+const rest = ref(false);
 
 const startSession = async () => {
+  rest.value = false;
   count.value = settingsStore.session;
   timerStore.resting = false;
   if (globalStore.showChat) {
@@ -58,20 +62,24 @@ const startSession = async () => {
   globalStore.socket.emit("startCountdown", {
     room: globalStore.room,
     duration: count.value,
+    rest: false,
   });
 };
 
 const startLongBreak = () => {
+  rest.value = true;
   (count.value = settingsStore.longBreak), (timerStore.stopped = false);
   timerStore.resting = true;
   timerStore.paused = false;
   globalStore.socket.emit("startCountdown", {
     room: globalStore.room,
     duration: count.value,
+    rest: true,
   });
 };
 
 const startShortBreak = () => {
+  rest.value = true;
   count.value = settingsStore.shortBreak;
   timerStore.stopped = false;
   timerStore.resting = true;
@@ -79,23 +87,32 @@ const startShortBreak = () => {
   globalStore.socket.emit("startCountdown", {
     room: globalStore.room,
     duration: count.value,
+    rest: true,
   });
 };
 
 const pause = () => {
   timerStore.paused = true;
-  globalStore.socket.emit("stopCountdown", { room: globalStore.room });
+  globalStore.socket.emit("stopCountdown", { room: globalStore.room, rest: rest.value });
   tempCount.value = count.value;
 };
 
 const resume = () => {
   timerStore.paused = false;
-  globalStore.socket.emit("startCountdown", { room: globalStore.room, duration: count.value });
+  globalStore.socket.emit("startCountdown", {
+    room: globalStore.room,
+    duration: count.value,
+    rest: rest.value,
+  });
 };
 
 const reset = () => {
   timerStore.paused = false;
-  globalStore.socket.emit("startCountdown", { room: globalStore.room, duration: 100 });
+  globalStore.socket.emit("startCountdown", {
+    room: globalStore.room,
+    duration: tempDuration.value,
+    rest: rest.value,
+  });
 };
 
 const stop = () => {
@@ -114,7 +131,9 @@ onMounted(() => {
     data.users = newUsers;
   });
 
-  globalStore.socket.on("countdown", (newCount) => {
+  globalStore.socket.on("countdown", ({ count: newCount, rest }) => {
+    timerStore.stopped = false;
+    timerStore.resting = rest;
     count.value = newCount;
     if (count.value === 0) {
       timerStore.stopped = true;
