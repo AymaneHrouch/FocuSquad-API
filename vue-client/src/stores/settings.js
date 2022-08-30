@@ -7,9 +7,9 @@ export const useSettingsStore = defineStore("settings", () => {
   const quote = ref(
     localStorage.getItem("quote") || "Don't let yesterday take up too much of today."
   );
-  const session = ref(localStorage.getItem("session") || 25 * 60);
-  const shortBreak = ref(localStorage.getItem("shortBreak") || 5 * 60);
-  const longBreak = ref(localStorage.getItem("longBreak") || 20 * 60);
+  const session = ref(25);
+  const shortBreak = ref(5);
+  const longBreak = ref(20);
 
   const globalStore = useGlobalStore();
 
@@ -19,48 +19,33 @@ export const useSettingsStore = defineStore("settings", () => {
     if (!session) return { error: "Please enter a session length" };
     if (!shortBreak) return { error: "Please enter a short break length" };
     if (!longBreak) return { error: "Please enter a long break length" };
-    if (session > 7200) return { error: "Session length must be less than 2 hours" };
-    if (shortBreak > 7200) return { error: "Short break length must be less than 2 hours" };
-    if (longBreak > 7200) return { error: "Long break length must be less than 2 hours" };
+    if (session > 120) return { error: "Session length must be less than 2 hours" };
+    if (shortBreak > 120) return { error: "Short break length must be less than 2 hours" };
+    if (longBreak > 120) return { error: "Long break length must be less than 2 hours" };
 
-    if (session < 60) return { error: "Session length must be at least 1 minute" };
-    if (shortBreak < 60) return { error: "Short break length must be at least 1 minute" };
-    if (longBreak < 60) return { error: "Long break length must be at least 1 minute" };
+    if (session < 1) return { error: "Session length must be at least 1 minute" };
+    if (shortBreak < 1) return { error: "Short break length must be at least 1 minute" };
+    if (longBreak < 1) return { error: "Long break length must be at least 1 minute" };
     return { ok: true };
   };
 
   const updateSettings = (newUsername, newQuote, newSession, newShortBreak, newLongBreak) => {
-    const newSessionInMinutes = newSession * 60;
-    const newShortBreakInMinutes = newShortBreak * 60;
-    const newLongBreakInMinutes = newLongBreak * 60;
-    const validation = validate(
-      newUsername,
-      newQuote,
-      newSessionInMinutes,
-      newShortBreakInMinutes,
-      newLongBreakInMinutes
-    );
+    const validation = validate(newUsername, newQuote, newSession, newShortBreak, newLongBreak);
     if (validation.error) return { error: validation.error };
 
     // Send setttings to the server
     globalStore.socket.emit("settings", {
       username: newUsername.trim(),
-      session: session.value === newSessionInMinutes ? null : newSessionInMinutes,
-      shortBreak: shortBreak.value === newShortBreakInMinutes ? null : newShortBreakInMinutes,
-      longBreak: longBreak.value === newLongBreakInMinutes ? null : newLongBreakInMinutes,
+      session: session.value === newSession ? null : newSession,
+      shortBreak: shortBreak.value === newShortBreak ? null : newShortBreak,
+      longBreak: longBreak.value === newLongBreak ? null : newLongBreak,
     });
 
     username.value = newUsername;
     quote.value = newQuote;
-    session.value = newSessionInMinutes;
-    shortBreak.value = newShortBreakInMinutes;
-    longBreak.value = newLongBreakInMinutes;
-
-    localStorage.setItem("username", newUsername);
-    localStorage.setItem("quote", newQuote);
-    localStorage.setItem("session", newSessionInMinutes);
-    localStorage.setItem("shortBreak", newShortBreakInMinutes);
-    localStorage.setItem("longBreak", newLongBreakInMinutes);
+    session.value = newSession;
+    shortBreak.value = newShortBreak;
+    longBreak.value = newLongBreak;
 
     return { ok: true };
   };

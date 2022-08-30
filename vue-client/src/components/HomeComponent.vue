@@ -19,19 +19,20 @@ import { useSettingsStore } from "@s/settings";
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
 
-function formatTime(totalSeconds) {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  const padTo2Digits = (num) => num.toString().padStart(2, "0");
-  return `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
-}
-
 onMounted(() => {
   globalStore.socket.on("roomSettings", ({ session, shortBreak, longBreak }) => {
     console.log("roomSettings", { session, shortBreak, longBreak });
     settingsStore.session = session || settingsStore.session;
     settingsStore.shortBreak = shortBreak || settingsStore.shortBreak;
     settingsStore.longBreak = longBreak || settingsStore.longBreak;
+  });
+
+  globalStore.socket.on("settings:req", () => {
+    globalStore.socket.emit("settings", {
+      session: settingsStore.session,
+      shortBreak: settingsStore.shortBreak,
+      longBreak: settingsStore.longBreak,
+    });
   });
 });
 </script>

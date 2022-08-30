@@ -14,6 +14,8 @@ module.exports = function (io, socket) {
     socket.join(room);
     console.log(`${username} has joined ${room}`);
 
+    socket.broadcast.to(user.room).emit("settings:req");
+
     // Send users and room info
     sendRoomUsers(user);
 
@@ -22,7 +24,7 @@ module.exports = function (io, socket) {
 
     // Update settings
     socket.on("settings", ({ username, session, shortBreak, longBreak }) => {
-      renameUser(io, socket.id, username);
+      if (username) renameUser(io, socket.id, username);
       const user = getCurrentUser(socket.id);
       sendRoomUsers(user);
       if (session || shortBreak || longBreak) {
@@ -37,9 +39,9 @@ module.exports = function (io, socket) {
           formatMessage(
             "🥰",
             `(${user.username}) has updated the settings:
-          ${session ? `*Session: ${session / 60} minutes\n` : ""}
-          ${shortBreak ? `*Short Break: ${shortBreak / 60} minutes\n` : ""}
-          ${longBreak ? `*Long Break: ${longBreak / 60} minutes\n` : ""}`
+          ${session ? `*Session: ${session} minutes\n` : ""}
+          ${shortBreak ? `*Short Break: ${shortBreak} minutes\n` : ""}
+          ${longBreak ? `*Long Break: ${longBreak} minutes\n` : ""}`
           )
         );
       }

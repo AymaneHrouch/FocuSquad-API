@@ -2,18 +2,18 @@
   <div id="timer">
     <div class="timer-options not-selectable" v-if="timerStore.stopped">
       <span class="timer-option" @click="startLongBreak"
-        >Long Break ({{ settingsStore.longBreak / 60 }}min)</span
+        >Long Break ({{ settingsStore.longBreak }}min)</span
       >
       <span class="timer-option" @click="startShortBreak"
-        >Short Break ({{ settingsStore.shortBreak / 60 }}min)</span
+        >Short Break ({{ settingsStore.shortBreak }}min)</span
       >
       <span class="timer-option" @click="startSession"
-        >Session ({{ settingsStore.session / 60 }}min)</span
+        >Session ({{ settingsStore.session }}min)</span
       >
     </div>
     <div class="countdown" v-else>
       <p class="quote">{{ settingsStore.quote }}</p>
-      <div class="time animate__animated animate__backInRight not-selectable">
+      <div class="time not-selectable">
         {{ formatTime(count) }}
       </div>
       <div class="controls not-selectable" v-if="timerStore.paused">
@@ -51,24 +51,23 @@ const rest = ref(false);
 
 const startSession = async () => {
   rest.value = false;
-  count.value = settingsStore.session;
-  timerStore.resting = false;
-  if (globalStore.showChat) {
-    // Sleep for 1 second to allow the chat to disappear
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-  timerStore.stopped = false;
-  timerStore.paused = false;
+
+  tempDuration.value = count.value = settingsStore.session * 60;
   globalStore.socket.emit("startCountdown", {
     room: globalStore.room,
     duration: count.value,
     rest: false,
   });
+
+  timerStore.stopped = false;
+  timerStore.paused = false;
+  timerStore.resting = false;
 };
 
 const startLongBreak = () => {
   rest.value = true;
-  (count.value = settingsStore.longBreak), (timerStore.stopped = false);
+  tempDuration.value = count.value = settingsStore.longBreak * 60;
+  timerStore.stopped = false;
   timerStore.resting = true;
   timerStore.paused = false;
   globalStore.socket.emit("startCountdown", {
@@ -80,7 +79,7 @@ const startLongBreak = () => {
 
 const startShortBreak = () => {
   rest.value = true;
-  count.value = settingsStore.shortBreak;
+  tempDuration.value = count.value = settingsStore.shortBreak * 60;
   timerStore.stopped = false;
   timerStore.resting = true;
   timerStore.paused = false;
@@ -93,7 +92,11 @@ const startShortBreak = () => {
 
 const pause = () => {
   timerStore.paused = true;
-  globalStore.socket.emit("stopCountdown", { room: globalStore.room, rest: rest.value });
+  globalStore.socket.emit("stopCountdown", {
+    room: globalStore.room,
+    rest: rest.value,
+    paused: true,
+  });
   tempCount.value = count.value;
 };
 
@@ -133,6 +136,7 @@ onMounted(() => {
 
   globalStore.socket.on("countdown", ({ count: newCount, rest }) => {
     timerStore.stopped = false;
+    timerStore.paused = false;
     timerStore.resting = rest;
     count.value = newCount;
     if (count.value === 0) {
@@ -152,7 +156,7 @@ onMounted(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 1s;
+  /* animation: fadeIn 1s; */
   padding: 3rem;
   text-align: center;
 }
