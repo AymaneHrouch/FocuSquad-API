@@ -1,5 +1,5 @@
 <template>
-  <Transition name="chat">
+  <Transition :name="timerStore.computedTransition">
     <div id="chat" v-if="globalStore.showChat && timerStore.resting">
       <main class="chat-main">
         <div
@@ -90,7 +90,7 @@ onMounted(() => {
 
     // Scroll to the bottom of the chat
     const chat = document.querySelector("#chat .chat-main");
-    chat.scrollTo(0, chat.scrollHeight)
+    chat.scrollTo(0, chat.scrollHeight);
   });
 });
 </script>
