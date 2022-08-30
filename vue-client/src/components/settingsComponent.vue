@@ -45,18 +45,18 @@
 </template>
 
 <script setup>
-import { useGlobalStore } from "@s/global";
-import { useSettingsStore } from "@s/settings";
+import { useGlobalStore } from '@s/global';
+import { useSettingsStore } from '@s/settings';
 
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
 
 const submit = () => {
-  const username = document.getElementById("username-input").value;
-  const quote = document.getElementById("quote-input").value;
-  const session = document.getElementById("session-input").value;
-  const shortBreak = document.getElementById("short-break-input").value;
-  const longBreak = document.getElementById("long-break-input").value;
+  const username = document.getElementById('username-input').value;
+  const quote = document.getElementById('quote-input').value;
+  const session = parseInt(document.getElementById('session-input').value);
+  const shortBreak = parseInt(document.getElementById('short-break-input').value);
+  const longBreak = parseInt(document.getElementById('long-break-input').value);
   const res = settingsStore.updateSettings(username, quote, session, shortBreak, longBreak);
   if (res.error) {
     alert(res.error);

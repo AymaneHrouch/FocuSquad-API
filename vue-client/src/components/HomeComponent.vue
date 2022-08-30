@@ -20,20 +20,35 @@ const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
 
 onMounted(() => {
-  globalStore.socket.on("roomSettings", ({ session, shortBreak, longBreak }) => {
-    console.log("roomSettings", { session, shortBreak, longBreak });
+  /**
+   * When a new user joins the room, they send settings:req event through the server
+   * The already connected users send settings:res to the server to sync the settings
+   * with new user
+   */
+  globalStore.socket.on("settings:req", () => {
+    globalStore.socket.emit("settings:res", {
+      session: settingsStore.session,
+      shortBreak: settingsStore.shortBreak,
+      longBreak: settingsStore.longBreak,
+      sync: true
+    });
+  });
+
+  /**
+   * The server gets the settings from settings:res it sends it through 
+   * settings:update event to all the connected users
+   * 
+   * Or when the a user change the settings using the settings component, the server
+   * sends the new settings to all the connected users using settings:update event
+   */
+  globalStore.socket.on("settings:update", ({ session, shortBreak, longBreak }) => {
+    // if some settings aren't changed, we keep using the old settings
     settingsStore.session = session || settingsStore.session;
     settingsStore.shortBreak = shortBreak || settingsStore.shortBreak;
     settingsStore.longBreak = longBreak || settingsStore.longBreak;
   });
 
-  globalStore.socket.on("settings:req", () => {
-    globalStore.socket.emit("settings", {
-      session: settingsStore.session,
-      shortBreak: settingsStore.shortBreak,
-      longBreak: settingsStore.longBreak,
-    });
-  });
+
 });
 </script>
 
