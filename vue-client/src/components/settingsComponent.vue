@@ -1,55 +1,47 @@
 <template>
-  <Transition name="settings" v-if="globalStore.showSettings">
-    <div class="modal-wraper">
-      <div class="settings-modal">
-        <span class="close-btn" @click="globalStore.showSettings = false">&times;</span>
-        <h2 class="modal-heading">Settings</h2>
-        <div class="setting-option">
-          <label for="username-input">Username</label>
-          <input type="text" id="username-input" :value="settingsStore.username" />
-        </div>
-
-        <div class="setting-option">
-          <label for="quote-input" title="Only you can see it">You Personal Quote</label>
-          <input type="text" id="quote-input" :value="settingsStore.quote" />
-        </div>
-
-        <div class="setting-option">
-          <label for="session-input">Session</label>
-          <input
-            type="number"
-            id="session-input"
-            min="1"
-            max="120"
-            :value="settingsStore.session / 60"
-          />
-        </div>
-
-        <div class="setting-option">
-          <label for="short-break-input">Short Break</label>
-          <input
-            type="number"
-            id="short-break-input"
-            min="1"
-            max="120"
-            :value="settingsStore.shortBreak / 60"
-          />
-        </div>
-
-        <div class="setting-option">
-          <label for="long-break-input">Long Break</label>
-          <input
-            type="number"
-            id="long-break-input"
-            min="1"
-            max="120"
-            :value="settingsStore.longBreak / 60"
-          />
-        </div>
-        <span class="ok-btn not-selectable" @click="submit">OK</span>
+  <div class="modal-wraper" v-if="globalStore.showSettings">
+    <div class="settings-modal">
+      <span class="close-btn" @click="globalStore.showSettings = false">&times;</span>
+      <h2 class="modal-heading">Settings</h2>
+      <div class="setting-option">
+        <label for="username-input">Username</label>
+        <input type="text" id="username-input" :value="settingsStore.username" />
       </div>
+
+      <div class="setting-option">
+        <label for="quote-input" title="Only you can see it">You Personal Quote</label>
+        <input type="text" id="quote-input" :value="settingsStore.quote" />
+      </div>
+
+      <div class="setting-option">
+        <label for="session-input">Session</label>
+        <input type="number" id="session-input" min="1" max="120" :value="settingsStore.session" />
+      </div>
+
+      <div class="setting-option">
+        <label for="short-break-input">Short Break</label>
+        <input
+          type="number"
+          id="short-break-input"
+          min="1"
+          max="120"
+          :value="settingsStore.shortBreak"
+        />
+      </div>
+
+      <div class="setting-option">
+        <label for="long-break-input">Long Break</label>
+        <input
+          type="number"
+          id="long-break-input"
+          min="1"
+          max="120"
+          :value="settingsStore.longBreak"
+        />
+      </div>
+      <span class="ok-btn not-selectable" @click="submit">OK</span>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <script setup>
@@ -75,15 +67,6 @@ const submit = () => {
 </script>
 
 <style>
-/** Settings modal animation */
-.settings-enter-active {
-  animation: bounceIn 0.5s;
-}
-
-.settings-leave-active {
-  animation: bounceOut 0.5s;
-}
-
 /** Settings Modal */
 .modal-heading {
   padding: 1rem 0;
