@@ -6,56 +6,58 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted } from 'vue';
 
-import ChatComponent from "@c/ChatComponent.vue";
-import TimerComponent from "@c/TimerComponent.vue";
-import SettingsComponent from "@c/settingsComponent.vue";
-import TogglersComponent from "@c/TogglersComponent.vue";
+import ChatComponent from '@c/ChatComponent.vue';
+import TimerComponent from '@c/TimerComponent.vue';
+import SettingsComponent from '@c/settingsComponent.vue';
+import TogglersComponent from '@c/TogglersComponent.vue';
 
-import { useGlobalStore } from "@s/global";
-import { useSettingsStore } from "@s/settings";
+import { useGlobalStore } from '@s/global';
+import { useSettingsStore } from '@s/settings';
 
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
 
 onMounted(() => {
+  globalStore.socket.on('countdown:state', (state) => {
+    timerStore[state] = true;
+  });
+
   /**
    * When a new user joins the room, they send settings:req event through the server
    * The already connected users send settings:res to the server to sync the settings
    * with new user
    */
-  globalStore.socket.on("settings:req", () => {
-    globalStore.socket.emit("settings:res", {
+  globalStore.socket.on('settings:req', () => {
+    globalStore.socket.emit('settings:res', {
       session: settingsStore.session,
       shortBreak: settingsStore.shortBreak,
       longBreak: settingsStore.longBreak,
-      sync: true
+      sync: true,
     });
   });
 
   /**
-   * The server gets the settings from settings:res it sends it through 
+   * The server gets the settings from settings:res event, then it sends it through
    * settings:update event to all the connected users
-   * 
-   * Or when the a user change the settings using the settings component, the server
+   *
+   * Or when a user change the settings using the settings component, the server
    * sends the new settings to all the connected users using settings:update event
    */
-  globalStore.socket.on("settings:update", ({ session, shortBreak, longBreak }) => {
+  globalStore.socket.on('settings:update', ({ session, shortBreak, longBreak }) => {
     // if some settings aren't changed, we keep using the old settings
     settingsStore.session = session || settingsStore.session;
     settingsStore.shortBreak = shortBreak || settingsStore.shortBreak;
     settingsStore.longBreak = longBreak || settingsStore.longBreak;
   });
-
-
 });
 </script>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Anek+Telugu:wght@500&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Anek+Telugu:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;700&display=swap');
 
 :root {
   --bg-color: #5a19d3;
@@ -82,7 +84,7 @@ input {
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: "Anek Telugu", sans-serif;
+  font-family: 'Anek Telugu', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;

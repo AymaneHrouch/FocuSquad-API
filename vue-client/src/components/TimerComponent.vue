@@ -32,97 +32,67 @@
 </template>
 
 <script setup>
-import { reactive, onMounted, ref } from "vue";
+import { reactive, onMounted, ref } from 'vue';
 
-import { useGlobalStore } from "@s/global";
-import { useSettingsStore } from "@s/settings";
-import { useTimerStore } from "@s/timer";
-import { formatTime } from "@/utils/formatTime";
+import { useGlobalStore } from '@s/global';
+import { useSettingsStore } from '@s/settings';
+import { useTimerStore } from '@s/timer';
+import { formatTime } from '@/utils/formatTime';
 
 let data = reactive({
   users: [],
 });
 
 const count = ref(0);
-const tempCount = ref(0);
 const tempDuration = ref(0);
 
-const rest = ref(false);
-
 const startSession = async () => {
-  rest.value = false;
-
   tempDuration.value = count.value = settingsStore.session * 60;
-  globalStore.socket.emit("startCountdown", {
-    room: globalStore.room,
+  globalStore.socket.emit('countdown:start', {
     duration: count.value,
-    rest: false,
+    isRest: false,
   });
 
-  timerStore.stopped = false;
-  timerStore.paused = false;
   timerStore.resting = false;
 };
 
 const startLongBreak = () => {
-  rest.value = true;
   tempDuration.value = count.value = settingsStore.longBreak * 60;
-  timerStore.stopped = false;
-  timerStore.resting = true;
-  timerStore.paused = false;
-  globalStore.socket.emit("startCountdown", {
-    room: globalStore.room,
+  globalStore.socket.emit('countdown:start', {
     duration: count.value,
-    rest: true,
+    isRest: true,
   });
+
+  timerStore.resting = true;
 };
 
 const startShortBreak = () => {
-  rest.value = true;
   tempDuration.value = count.value = settingsStore.shortBreak * 60;
-  timerStore.stopped = false;
-  timerStore.resting = true;
-  timerStore.paused = false;
-  globalStore.socket.emit("startCountdown", {
-    room: globalStore.room,
+  globalStore.socket.emit('countdown:start', {
     duration: count.value,
-    rest: true,
+    isRest: true,
   });
+
+  timerStore.resting = true;
 };
 
 const pause = () => {
-  timerStore.paused = true;
-  globalStore.socket.emit("stopCountdown", {
-    room: globalStore.room,
-    rest: rest.value,
-    paused: true,
+  globalStore.socket.emit('countdown:pause', {
+    timeLeft: count.value,
   });
-  tempCount.value = count.value;
 };
 
 const resume = () => {
-  timerStore.paused = false;
-  globalStore.socket.emit("startCountdown", {
-    room: globalStore.room,
-    duration: count.value,
-    rest: rest.value,
-  });
+  globalStore.socket.emit('countdown:resume');
 };
 
 const reset = () => {
   timerStore.paused = false;
-  globalStore.socket.emit("startCountdown", {
-    room: globalStore.room,
-    duration: tempDuration.value,
-    rest: rest.value,
-  });
+  globalStore.socket.emit('countdown:reset');
 };
 
 const stop = () => {
-  timerStore.stopped = true;
-  timerStore.paused = true;
-  timerStore.resting = true;
-  globalStore.socket.emit("stopCountdown", { room: globalStore.room });
+  globalStore.socket.emit('countdown:stop');
 };
 
 const globalStore = useGlobalStore();
@@ -130,21 +100,33 @@ const settingsStore = useSettingsStore();
 const timerStore = useTimerStore();
 
 onMounted(() => {
-  globalStore.socket.on("roomUsers", ({ users: newUsers }) => {
+  globalStore.socket.on('roomUsers', ({ users: newUsers }) => {
     data.users = newUsers;
   });
 
-  globalStore.socket.on("countdown", ({ count: newCount, rest }) => {
+  globalStore.socket.on('countdown:update', ({ count: newCount, rest }) => {
     timerStore.stopped = false;
     timerStore.paused = false;
     timerStore.resting = rest;
     count.value = newCount;
+    document.title = `${formatTime(count.value)}`;
     if (count.value === 0) {
       timerStore.stopped = true;
       timerStore.paused = true;
       timerStore.resting = true;
+      document.title = 'Study Buddies';
       alert("Time's up!");
     }
+  });
+
+  globalStore.socket.on('countdown:paused', () => {
+    timerStore.paused = true;
+  });
+
+  globalStore.socket.on('countdown:stopped', () => {
+    timerStore.stopped = true;
+    timerStore.resting = true;
+    document.title = 'Study Buddies';
   });
 });
 </script>
@@ -156,7 +138,6 @@ onMounted(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* animation: fadeIn 1s; */
   padding: 3rem;
   text-align: center;
 }
@@ -228,7 +209,7 @@ onMounted(() => {
 }
 
 .user-icon {
-  background-image: url("@/assets/bx-user.svg");
+  background-image: url('@/assets/bx-user.svg');
   background-position: center;
   background-repeat: no-repeat;
   display: inline-block;

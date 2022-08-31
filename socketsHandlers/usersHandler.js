@@ -1,5 +1,6 @@
 const { formatMessage } = require('../utils/messages');
 const { userJoin, getRoomUsers, userLeave, renameUser, getCurrentUser } = require('../utils/users');
+const {getCountdownState} = require("../utils/countdowns");
 
 module.exports = function (io, socket) {
   const sendRoomUsers = (user) => {
@@ -16,6 +17,9 @@ module.exports = function (io, socket) {
 
     // The user requests current settings
     socket.broadcast.to(user.room).emit('settings:req');
+
+    // Send the user the current state of the countdown
+    socket.to(socket.id).emit('countdown:state', getCountdownState(user.room));
 
     // Send users and room info
     sendRoomUsers(user);

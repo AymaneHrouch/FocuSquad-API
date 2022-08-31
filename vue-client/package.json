@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "anchorme": "^2.1.2",
     "core-js": "^3.8.3",
     "pinia": "^2.0.21",
     "socket.io-client": "^4.5.1",
