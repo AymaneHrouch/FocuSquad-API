@@ -39,11 +39,11 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, nextTick } from "vue";
+import { onMounted, reactive, ref, nextTick } from 'vue';
 
-import { useGlobalStore } from "@s/global";
-import { useSettingsStore } from "@s/settings";
-import { useTimerStore } from "@s/timer";
+import { useGlobalStore } from '@s/global';
+import { useSettingsStore } from '@s/settings';
+import { useTimerStore } from '@s/timer';
 
 const globalStore = useGlobalStore();
 const settingsStore = useSettingsStore();
@@ -55,41 +55,44 @@ let messages = reactive([]);
 
 const handleSubmit = async (e) => {
   if (e) e.preventDefault();
+  const newMessage = messageInput.value.value;
+  if (!newMessage) return;
 
   // Format time hh:mm a
   let time = new Date().toLocaleTimeString();
-  time = time.split(":").splice(0, 2).join(":") + " " + time.split(" ")[1].toLowerCase();
+  time = time.split(':').splice(0, 2).join(':') + ' ' + time.split(' ')[1].toLowerCase();
   // Append the message to the messages array
   messages.push({
-    text: messageInput.value.value,
+    text: newMessage,
     time,
   });
 
+  // Wait for the next tick to ensure the message is added to the DOM
   await nextTick();
 
   // Scroll to the bottom of the chat window
-  const chat = document.querySelector("#chat .chat-main");
+  const chat = document.querySelector('#chat .chat-main');
   chat.scrollTo(0, chat.scrollHeight);
 
   // Send message to server
-  globalStore.socket.emit("chatMessage", messageInput.value.value);
+  globalStore.socket.emit('chatMessage', messageInput.value.value);
 
   // Clear the input field
-  messageInput.value.value = "";
+  messageInput.value.value = '';
 };
 
 onMounted(() => {
-  globalStore.socket.emit("joinRoom", {
+  globalStore.socket.emit('joinRoom', {
     username: settingsStore.username,
     room: globalStore.room,
   });
 
-  globalStore.socket.on("message", (msg) => {
-    console.log("new message", msg);
+  globalStore.socket.on('message', (msg) => {
+    console.log('new message', msg);
     messages.push(msg);
 
     // Scroll to the bottom of the chat
-    const chat = document.querySelector("#chat .chat-main");
+    const chat = document.querySelector('#chat .chat-main');
     chat.scrollTo(0, chat.scrollHeight);
   });
 });
@@ -101,7 +104,7 @@ onMounted(() => {
   padding-top: 1rem;
   width: 40%;
   height: 100%;
-  font-family: "Hind Siliguri", sans-serif;
+  font-family: 'Hind Siliguri', sans-serif;
   font-size: 1rem;
   line-height: 1rem;
   letter-spacing: 0px;
@@ -189,7 +192,7 @@ onMounted(() => {
 
 #submit-btn {
   height: 2rem;
-  background-image: url("@/assets/bxs-send.svg");
+  background-image: url('@/assets/bxs-send.svg');
   width: 2rem;
   padding: 1.1rem;
   cursor: pointer;
