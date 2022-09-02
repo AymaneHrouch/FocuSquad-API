@@ -1,0 +1,82 @@
+<template>
+  <main>
+    <div class="modal">
+      <h2>Welcome to Study Buddies</h2>
+      <p>Create or join a study room</p>
+      <input type="text" ref="generator" />
+      <span id="generate_room" @click="generateRandomRoom">generate random</span>
+      <button class="btn" @click="go">Go!!</button>
+    </div>
+  </main>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const generator = ref(null);
+
+const randomString = () => Math.random().toString(36).substring(2, 15);
+
+const generateRandomRoom = () => {
+  generator.value.value = randomString();
+};
+
+const go = () => {
+  // Redirect to the room
+  const room = generator.value.value;
+  if (room) {
+    window.location.href = `?room=${room}`;
+  } else {
+    window.location.href = `?room=${randomString()}`;
+  }
+};
+</script>
+
+<style scopped>
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.modal input {
+  align-self: center;
+  height: 2rem;
+  width: 100%;
+  font-size: 1.3rem;
+  padding: 0.5rem;
+}
+
+#generate_room {
+  cursor: pointer;
+  user-select: none;
+}
+
+#generate_room:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  color: var(--bg-color);
+  border: none;
+  border-radius: 0.2rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  float: right;
+}
+
+.btn:hover {
+  background-color: #be5ed4;
+}
+</style>

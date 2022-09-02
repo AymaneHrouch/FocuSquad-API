@@ -99,12 +99,6 @@ body {
   width: 100%;
 }
 
-.svg-icon {
-  background-position: center;
-  background-repeat: no-repeat;
-  display: inline-block;
-}
-
 .not-selectable {
   user-select: none;
   -moz-user-select: none;
