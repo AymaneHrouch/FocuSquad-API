@@ -13,6 +13,7 @@
   "author": "Aymane Hrouch",
   "license": "MIT",
   "dependencies": {
+    "config": "^3.3.7",
     "express": "^4.18.1",
     "moment": "^2.29.4",
     "redis": "^4.3.0",

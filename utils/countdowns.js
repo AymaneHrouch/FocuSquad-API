@@ -1,29 +1,20 @@
-const countdowns = [];
+const redisClient = require("../startup/redis");
 
-function getCountdown(room) {
-  return countdowns.find((countdown) => countdown.room === room);
-}
-
-function getCountdownIndex(room) {
-  return countdowns.findIndex((countdown) => countdown.room === room);
-}
-
-function getCountdownState(room) {
-  const countdownIndex = getCountdownIndex(room);
-  if (countdownIndex === -1) return 'stopped';
-  return countdowns[countdownIndex].state;
+async function getCountdownState(room) {
+  const state = await redisClient.hGet(`countdown:${room}`, "state");
+  return state || "stopped";
 }
 
 function isActive(room) {
-  const countdown = countdowns.find((countdown) => countdown.room === room);
-  return countdown ? true : false;
+  const state = redisClient.hGet(`countdown:${room}`, "state");
+  return state === "active";
 }
 
 function sendHeartBeats(io, room, duration, isRest) {
   let count = duration;
   interval = setInterval(() => {
     // Todo: send isRest only once when new user is connected
-    io.to(room).emit('countdown:update', { count, rest: isRest });
+    io.to(room).emit("countdown:update", { count, rest: isRest === "1" });
     console.log(`${count} to ${room}`);
     count--;
 
@@ -34,55 +25,60 @@ function sendHeartBeats(io, room, duration, isRest) {
   return interval;
 }
 
-function startCountdown(io, room, duration, isRest) {
+async function startCountdown(io, room, duration, isRest) {
+  // minus one just to make the app smoother
   let count = duration - 1;
+
   // Check if countdown of this room is already active
-  if (isActive(room)) return console.log('Countdown already active');
+  if (isActive(room)) return console.log("Countdown already active");
 
   // Create new countdown
-  countdowns.push({ room, isRest, duration });
+  await redisClient.hSet(`countdown:${room}`, "state", "active");
+  await redisClient.hSet(`countdown:${room}`, "isRest", isRest ? 1 : 0);
+  await redisClient.hSet(`countdown:${room}`, "duration", duration);
+  redisClient.expire(`countdown:${room}`, 86400);
 
   // Update countdown every second
   const interval = sendHeartBeats(io, room, count, isRest);
 
   // Save the countdown in the array
-  const index = getCountdownIndex(room);
-  countdowns[index].interval = interval;
+  redisClient.hSet(`countdown:${room}`, "interval", parseInt(interval));
 }
 
-function pauseCountdown(room, timeLeft) {
-  const index = getCountdownIndex(room);
-  if (index === -1) return console.log("Countdown doesn't exist");
-  countdowns[index].timeLeft = timeLeft;
-  countdowns[index].state = 'paused';
-  clearInterval(countdowns[index].interval);
+async function pauseCountdown(room, timeLeft) {
+  await redisClient.hSet(`countdown:${room}`, "timeLeft", timeLeft);
+  await redisClient.hSet(`countdown:${room}`, "state", "paused");
+  const interval = await redisClient.hGet(`countdown:${room}`, "interval");
+  clearInterval(interval);
 }
 
-function resumeCountdown(io, room) {
-  const index = getCountdownIndex(room);
-  if (index === -1) return console.log("Countdown doesn't exist");
-  if (countdowns[index].state === 'paused') {
-    countdowns[index].state = 'active';
-    const interval = sendHeartBeats(io, room, countdowns[index].timeLeft, countdowns[index].isRest);
-    countdowns[index].interval = interval;
+async function resumeCountdown(io, room) {
+  const state = await redisClient.hGet(`countdown:${room}`, "state");
+  if (state === "paused") {
+    await redisClient.hSet(`countdown:${room}`, "state", "active");
+    const timeLeft = await redisClient.hGet(`countdown:${room}`, "timeLeft");
+    const isRest = await redisClient.hGet(`countdown:${room}`, "isRest");
+    const interval = sendHeartBeats(io, room, timeLeft, isRest);
+    await redisClient.hSet(`countdown:${room}`, "interval", parseInt(interval));
   }
 }
 
-function resetCountdown(io, room) {
-  const index = getCountdownIndex(room);
-  if (index === -1) return console.log("Countdown doesn't exist");
-  if (countdowns[index].state === 'paused') {
-    countdowns[index].state = 'active';
-    const interval = sendHeartBeats(io, room, countdowns[index].duration, countdowns[index].isRest);
-    countdowns[index].interval = interval;
+async function resetCountdown(io, room) {
+  const state = await redisClient.hGet(`countdown:${room}`, "state");
+  if (state === "paused") {
+    await redisClient.hSet(`countdown:${room}`, "state", "active");
+    const duration = await redisClient.hGet(`countdown:${room}`, "duration");
+    const isRest = await redisClient.hGet(`countdown:${room}`, "isRest");
+    const interval = sendHeartBeats(io, room, duration, isRest);
+    await redisClient.hSet(`countdown:${room}`, "interval", parseInt(interval));
   }
 }
 
-function stopCountdown(room) {
-  const index = getCountdownIndex(room);
-  if (index !== -1) {
-    clearInterval(countdowns[index].interval);
-    countdowns.splice(index, 1)[0];
+async function stopCountdown(room) {
+  const interval = await redisClient.hGet(`countdown:${room}`, "interval");
+  if (interval) {
+    clearInterval(interval);
+    redisClient.del(`countdown:${room}`);
   }
 }
 

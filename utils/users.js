@@ -1,28 +1,27 @@
 const { formatMessage } = require("../utils/messages");
-
-const users = [];
-
-// Get All users
-const getUsers = () => {
-  return users;
-};
+const redisClient = require("../startup/redis");
 
 // Join user to chat
-function userJoin(id, username, room) {
+async function userJoin(id, username, room) {
   const user = { id, username, room };
-  users.push(user);
+  await redisClient.hSet(`user:${id}`, "username", username);
+  await redisClient.hSet(`user:${id}`, "room", room);
+  await redisClient.sAdd(`room:${room}`, id);
+  redisClient.expire(`user:${id}`, 86400);
+  redisClient.expire(`room:${room}`, 86400);
   return user;
 }
 
 // Get current user
-function getCurrentUser(id) {
-  return users.find((user) => user.id === id);
+async function getCurrentUser(id) {
+  const user = await redisClient.hGetAll(`user:${id}`);
+  return user;
 }
 
 // Rename current user
 function renameUser(io, id, username) {
   const user = getCurrentUser(id);
-  const oldUsername = user.username
+  const oldUsername = user.username;
   if (user.username !== username) {
     user.username = username;
     io.to(user.room).emit(
@@ -34,15 +33,14 @@ function renameUser(io, id, username) {
 
 // User leaves chat
 function userLeave(id) {
-  const index = users.findIndex((user) => user.id === id);
-  if (index !== -1) {
-    return users.splice(index, 1)[0];
-  }
+  // No need to await here
+  redisClient.del(`user:${id}`);
 }
 
 // Get room users
-function getRoomUsers(room) {
-  return users.filter((user) => user.room === room);
+async function getRoomUsers(room) {
+  const users = await redisClient.sMembers(`room:${room}`);
+  return users;
 }
 
 module.exports = {
@@ -51,5 +49,4 @@ module.exports = {
   renameUser,
   userLeave,
   getRoomUsers,
-  getUsers,
 };

@@ -3,16 +3,21 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 
+const redisClient = require("./startup/redis");
+
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+
+// Connect to Redis
+redisClient.connect();
 
 // sockets handlers
 const countdownHandler = require("./socketsHandlers/countdownHandler");
 const usersHandler = require("./socketsHandlers/usersHandler");
 const messagesHandler = require("./socketsHandlers/messagesHandler");
 
-const onConnection = socket => {
+const onConnection = (socket) => {
   console.log("new connection");
   usersHandler(io, socket);
   countdownHandler(io, socket);
