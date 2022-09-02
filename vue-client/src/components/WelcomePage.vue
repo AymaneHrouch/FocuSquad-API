@@ -32,8 +32,8 @@ const go = () => {
 };
 </script>
 
-<style scopped>
-main .modal {
+<style scoped>
+main {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,11 +42,14 @@ main .modal {
   overflow: hidden;
 }
 
-.modal {
+main .modal {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  width: 2rem;
+  /* background-color: red; */
+  width: 20rem;
   gap: 0.5rem;
 }
 
