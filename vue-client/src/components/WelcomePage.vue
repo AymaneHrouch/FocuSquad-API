@@ -69,17 +69,4 @@ main .modal {
 #generate_room:hover {
   text-decoration: underline;
 }
-
-.btn {
-  color: var(--bg-color);
-  border: none;
-  border-radius: 0.2rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  float: right;
-}
-
-.btn:hover {
-  background-color: #be5ed4;
-}
 </style>

@@ -88,7 +88,6 @@ onMounted(() => {
   });
 
   globalStore.socket.on('message', (msg) => {
-    console.log('new message', msg);
     messages.push(msg);
 
     // Scroll to the bottom of the chat
@@ -195,6 +194,7 @@ onMounted(() => {
   background-image: url('@/assets/bxs-send.svg');
   width: 2rem;
   padding: 1.1rem;
+  margin-left: 0.2rem;
   cursor: pointer;
 }
 

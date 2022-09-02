@@ -39,6 +39,10 @@ import { useSettingsStore } from '@s/settings';
 import { useTimerStore } from '@s/timer';
 import { formatTime } from '@/utils/formatTime';
 
+const globalStore = useGlobalStore();
+const settingsStore = useSettingsStore();
+const timerStore = useTimerStore();
+
 let data = reactive({
   users: [],
 });
@@ -56,7 +60,6 @@ const startSession = async () => {
     duration: count.value,
     isRest: false,
   });
-
 };
 
 const startLongBreak = () => {
@@ -100,10 +103,6 @@ const stop = () => {
   globalStore.socket.emit('countdown:stop');
 };
 
-const globalStore = useGlobalStore();
-const settingsStore = useSettingsStore();
-const timerStore = useTimerStore();
-
 onMounted(() => {
   globalStore.socket.on('roomUsers', ({ users: newUsers }) => {
     data.users = newUsers;
@@ -116,11 +115,27 @@ onMounted(() => {
     count.value = newCount;
     document.title = `${formatTime(count.value)}`;
     if (count.value === 0) {
+      // Show toast
+      if (timerStore.resting) {
+        globalStore.toast({
+          title: 'Break is over',
+          message: 'Got some rest? Time to get back to work!',
+          buttonLabel: "Let's go!",
+        });
+      } else {
+        globalStore.toast({
+          title: 'Congrats on completing your session!!',
+          message:
+            'Take a break, talk to your friends about what you did and what are you planning to do next session.',
+          buttonLabel: 'Take a break',
+        });
+        timerStore.resting = true;
+      }
+
       timerStore.stopped = true;
       timerStore.paused = true;
-      timerStore.resting = true;
       document.title = 'Study Buddies';
-      alert("Time's up!");
+      playSound();
     }
   });
 
@@ -134,6 +149,11 @@ onMounted(() => {
     document.title = 'Study Buddies';
   });
 });
+
+const playSound = () => {
+  const audio = new Audio(require('../assets/notification-sound.wav'));
+  audio.play();
+};
 </script>
 
 <style>

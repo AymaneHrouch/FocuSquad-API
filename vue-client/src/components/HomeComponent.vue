@@ -1,4 +1,5 @@
 <template>
+  <ToastComponent />
   <TogglersComponent />
   <SettingsComponent />
   <TimerComponent />
@@ -8,6 +9,7 @@
 <script setup>
 import { onMounted } from 'vue';
 
+import ToastComponent from './ToastComponent.vue';
 import ChatComponent from '@c/ChatComponent.vue';
 import TimerComponent from '@c/TimerComponent.vue';
 import SettingsComponent from '@c/settingsComponent.vue';
@@ -158,5 +160,18 @@ body {
     -webkit-user-select: none;
     -o-user-select: none;
   }
+}
+
+.btn {
+  color: var(--bg-color);
+  border: none;
+  border-radius: 0.2rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  float: right;
+}
+
+.btn:hover {
+  background-color: #be5ed4;
 }
 </style>
