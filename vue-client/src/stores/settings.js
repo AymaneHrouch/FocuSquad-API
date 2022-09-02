@@ -44,6 +44,8 @@ export const useSettingsStore = defineStore("settings", () => {
 
     username.value = newUsername;
     quote.value = newQuote;
+    localStorage.username = newUsername;
+    localStorage.quote = newQuote;
     session.value = newSession;
     shortBreak.value = newShortBreak;
     longBreak.value = newLongBreak;

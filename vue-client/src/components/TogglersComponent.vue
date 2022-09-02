@@ -65,6 +65,7 @@ const logout = () => {
   background-image: url('@/assets/bx-log-out.svg');
   align-self: center;
   background-color: transparent;
+  z-index: 1;
 }
 
 .chat-icon {
