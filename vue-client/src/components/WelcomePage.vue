@@ -33,7 +33,7 @@ const go = () => {
 </script>
 
 <style scopped>
-main {
+main .modal {
   display: flex;
   justify-content: center;
   align-items: center;
