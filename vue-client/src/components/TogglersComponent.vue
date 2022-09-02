@@ -74,4 +74,10 @@ const logout = () => {
 .settings-icon {
   z-index: 4;
 }
+
+@media only screen and (max-width: 900px) {
+  #togglers {
+    right: 0;
+  }
+}
 </style>

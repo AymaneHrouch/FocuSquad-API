@@ -26,6 +26,7 @@ const globalStore = useGlobalStore();
   justify-content: center;
   align-items: center;
   position: absolute;
+  z-index: 9999;
 }
 .toast {
   display: flex;

@@ -142,9 +142,8 @@ onMounted(() => {
 .message {
   width: 70%;
   background-color: green;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem 0.7rem;
-  border-radius: 0.5rem;
+  margin-bottom: 0.3rem;
+  padding: 0.5rem 0.2rem;
   word-wrap: break-word;
 }
 
@@ -167,7 +166,6 @@ onMounted(() => {
 
 #msg {
   flex: 1;
-  border-radius: 0.5rem;
   border: none;
   background-color: #ddd;
   height: 2rem;
@@ -191,11 +189,13 @@ onMounted(() => {
 
 #submit-btn {
   height: 2rem;
+  padding: 0;
   background-image: url('@/assets/bxs-send.svg');
   width: 2rem;
-  padding: 1.1rem;
   margin-left: 0.2rem;
   cursor: pointer;
+  border-radius: 0;
+  overflow: hidden;
 }
 
 /** Chat animation */
