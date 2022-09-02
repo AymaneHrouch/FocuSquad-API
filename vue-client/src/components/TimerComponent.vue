@@ -91,6 +91,7 @@ const pause = () => {
 };
 
 const resume = () => {
+  timerStore.paused = false;
   globalStore.socket.emit('countdown:resume');
 };
 
@@ -119,7 +120,7 @@ onMounted(() => {
       if (timerStore.resting) {
         globalStore.toast({
           title: 'Break is over',
-          message: 'Got some rest? Time to get back to work!',
+          message: 'Got some rest? Time to go back to work!',
           buttonLabel: "Let's go!",
         });
       } else {
