@@ -168,8 +168,19 @@ body {
   border-radius: 0.2rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  float: right;
+  float: left;
+  max-width: max-content;
+  background-color: #be5ed4;
+  transition: all 0.2s ease-in-out;
 }
+
+.btn:hover {
+  cursor: pointer;
+  background-color: #ae36c9;
+  color: #000;
+  outline: 2px solid #000;
+}
+
 
 .btn:hover {
   background-color: #be5ed4;

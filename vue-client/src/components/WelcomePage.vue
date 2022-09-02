@@ -69,4 +69,10 @@ main .modal {
 #generate_room:hover {
   text-decoration: underline;
 }
+
+.btn {
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
 </style>

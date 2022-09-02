@@ -3,43 +3,41 @@
     <div class="settings-modal">
       <span class="close-btn" @click="globalStore.showSettings = false">&times;</span>
       <h2 class="modal-heading">Settings</h2>
-      <div class="setting-option">
-        <label for="username-input">Username</label>
-        <input type="text" id="username-input" :value="settingsStore.username" />
+      <div class="settings-options">
+        <div class="setting-option">
+          <label for="username-input">Username</label>
+          <input type="text" id="username-input" :value="settingsStore.username" />
+        </div>
+        <div class="setting-option">
+          <label for="quote-input" title="Only you can see it">You Personal Quote</label>
+          <input type="text" id="quote-input" :value="settingsStore.quote" />
+        </div>
+        <div class="setting-option">
+          <label for="session-input">Session</label>
+          <input type="number" id="session-input" min="1" max="120" :value="settingsStore.session" />
+        </div>
+        <div class="setting-option">
+          <label for="short-break-input">Short Break</label>
+          <input
+            type="number"
+            id="short-break-input"
+            min="1"
+            max="120"
+            :value="settingsStore.shortBreak"
+          />
+        </div>
+        <div class="setting-option">
+          <label for="long-break-input">Long Break</label>
+          <input
+            type="number"
+            id="long-break-input"
+            min="1"
+            max="120"
+            :value="settingsStore.longBreak"
+          />
+        </div>
       </div>
-
-      <div class="setting-option">
-        <label for="quote-input" title="Only you can see it">You Personal Quote</label>
-        <input type="text" id="quote-input" :value="settingsStore.quote" />
-      </div>
-
-      <div class="setting-option">
-        <label for="session-input">Session</label>
-        <input type="number" id="session-input" min="1" max="120" :value="settingsStore.session" />
-      </div>
-
-      <div class="setting-option">
-        <label for="short-break-input">Short Break</label>
-        <input
-          type="number"
-          id="short-break-input"
-          min="1"
-          max="120"
-          :value="settingsStore.shortBreak"
-        />
-      </div>
-
-      <div class="setting-option">
-        <label for="long-break-input">Long Break</label>
-        <input
-          type="number"
-          id="long-break-input"
-          min="1"
-          max="120"
-          :value="settingsStore.longBreak"
-        />
-      </div>
-      <span class="ok-btn not-selectable" @click="submit">OK</span>
+      <span class="btn not-selectable" @click="submit">OK</span>
     </div>
   </div>
 </template>
@@ -66,10 +64,16 @@ const submit = () => {
 };
 </script>
 
-<style>
+<style scoped>
 /** Settings Modal */
 .modal-heading {
-  padding: 1rem 0;
+  padding: 0 0;
+  border-bottom: 1px solid #bcbcbc;
+  margin: 0;
+}
+
+.settings-options {
+  padding-top: 1rem;
 }
 
 .modal-wraper {
@@ -83,13 +87,12 @@ const submit = () => {
 }
 
 .settings-modal {
-  background-color: var(--primary-color);
+  background-color: var(--bg-color);
   position: absolute;
   height: auto;
   width: 25rem;
   border-radius: 0.5rem;
   padding: 1rem;
-  color: #000;
   border: solid #000 2px;
   z-index: 2;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 60px 1px;
@@ -114,16 +117,4 @@ const submit = () => {
   padding: 0 0.3rem;
 }
 
-.ok-btn {
-  color: var(--bg-color);
-  border: none;
-  border-radius: 0.2rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  float: right;
-  margin-top: 3rem;
-}
-.ok-btn:hover {
-  background-color: #be5ed4;
-}
 </style>
