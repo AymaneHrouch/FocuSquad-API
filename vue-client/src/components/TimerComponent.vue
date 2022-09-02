@@ -47,23 +47,28 @@ const count = ref(0);
 const tempDuration = ref(0);
 
 const startSession = async () => {
+  timerStore.resting = false;
+  timerStore.paused = false;
+  timerStore.stopped = false;
+
   tempDuration.value = count.value = settingsStore.session * 60;
   globalStore.socket.emit('countdown:start', {
     duration: count.value,
     isRest: false,
   });
 
-  timerStore.resting = false;
 };
 
 const startLongBreak = () => {
+  timerStore.resting = true;
+  timerStore.paused = false;
+  timerStore.stopped = false;
+
   tempDuration.value = count.value = settingsStore.longBreak * 60;
   globalStore.socket.emit('countdown:start', {
     duration: count.value,
     isRest: true,
   });
-
-  timerStore.resting = true;
 };
 
 const startShortBreak = () => {
