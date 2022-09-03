@@ -4,6 +4,7 @@ const { getCountdownState } = require("../utils/countdowns");
 
 module.exports = function (io, socket) {
   const sendRoomUsers = async (user) => {
+    const d = await getRoomUsers(user.room);
     io.to(user.room).emit("roomUsers", {
       users: await getRoomUsers(user.room),
     });

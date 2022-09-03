@@ -39,8 +39,12 @@ function userLeave(id) {
 
 // Get room users
 async function getRoomUsers(room) {
-  const users = await redisClient.sMembers(`room:${room}`);
-  return users;
+  const usersIds = await redisClient.sMembers(`room:${room}`);
+  // Promise.all is used to wait for all the promises to resolve
+  const usernames = await Promise.all(
+    usersIds.map(async (id) => await redisClient.hGet(`user:${id}`, "username"))
+  );
+  return usernames;
 }
 
 module.exports = {
