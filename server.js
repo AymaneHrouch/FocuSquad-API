@@ -19,6 +19,12 @@ const messagesHandler = require("./socketsHandlers/messagesHandler");
 
 const onConnection = (socket) => {
   console.log("new connection");
+
+  // Tell the frontend that the server is running
+  socket.on("ping", () => {
+    io.to(socket.id).emit("pong");
+  });
+
   usersHandler(io, socket);
   countdownHandler(io, socket);
   messagesHandler(io, socket);
