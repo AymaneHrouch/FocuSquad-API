@@ -13,11 +13,20 @@ async function isActive(room) {
   return state === "active";
 }
 
+/**
+ * 
+ * @param {*} io 
+ * @param {*} room 
+ * @param {*} duration 
+ * @param {string} isRest 
+ * @returns 
+ */
 function sendHeartBeats(io, room, duration, isRest) {
   let count = duration;
+  const rest = isRest === "true" ? true : false;
   interval = setInterval(() => {
     // Todo: send isRest only once when new user is connected
-    io.to(room).emit("countdown:update", { count, rest: isRest === "true" ? true : false });
+    io.to(room).emit("countdown:update", { count, rest });
     countdownDebugger(`${count} to ${room}, isRest=${isRest}`);
     count--;
 
@@ -42,7 +51,7 @@ async function startCountdown(io, room, duration, isRest) {
   redisClient.expire(`countdown:${room}`, 86400);
 
   // Update countdown every second
-  const interval = sendHeartBeats(io, room, count, isRest);
+  const interval = sendHeartBeats(io, room, count, String(isRest));
 
   // Save the countdown in the array
   redisClient.hSet(`countdown:${room}`, "interval", parseInt(interval));
