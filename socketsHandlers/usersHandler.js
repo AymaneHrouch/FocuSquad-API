@@ -32,7 +32,6 @@ module.exports = function (io, socket) {
     socket.on("settings:res", async ({ username, session, shortBreak, longBreak, sync }) => {
       if (username) renameUser(io, socket.id, username);
       const user = await getCurrentUser(socket.id);
-      console.log("user", user);
       sendRoomUsers(user);
       if (session || shortBreak || longBreak) {
         io.to(user.room).emit("settings:update", {

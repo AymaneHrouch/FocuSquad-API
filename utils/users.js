@@ -19,8 +19,8 @@ async function getCurrentUser(id) {
 }
 
 // Rename current user
-function renameUser(io, id, username) {
-  const user = getCurrentUser(id);
+async function renameUser(io, id, username) {
+  const user = await getCurrentUser(id);
   const oldUsername = user.username;
   if (user.username !== username) {
     user.username = username;
