@@ -1,4 +1,4 @@
-# StudyBuddies-API
+# FocuSquad-API
 
 ## Project setup
 
@@ -24,6 +24,6 @@ npm run server
 npm start
 ```
 
-This is the Node.js API of [StudyBuddies](https://studybuddies.hrouch.me/).
+This is the Node.js API of [FocuSquad](https://focusquad.hrouch.me/).
 
-Here's the [StudyBuddies-frontend](https://github.com/aymanehrouch/studybuddies-frontend) repository.
+Here's the [FocuSquad-frontend](https://github.com/aymanehrouch/focusquad-frontend) repository.
