@@ -4,7 +4,6 @@ const { getCountdownState } = require("../utils/countdowns");
 
 module.exports = function (io, socket) {
   const sendRoomUsers = async (user) => {
-    const d = await getRoomUsers(user.room);
     io.to(user.room).emit("roomUsers", {
       users: await getRoomUsers(user.room),
     });
@@ -30,7 +29,7 @@ module.exports = function (io, socket) {
 
     // When the server gets the current/new settings, we send them to all users in the room
     socket.on("settings:res", async ({ username, session, shortBreak, longBreak, sync }) => {
-      if (username) renameUser(io, socket.id, username);
+      if (username) await renameUser(io, socket.id, username);
       const user = await getCurrentUser(socket.id);
       sendRoomUsers(user);
       if (session || shortBreak || longBreak) {
@@ -62,8 +61,8 @@ module.exports = function (io, socket) {
       }
     });
 
-    socket.on("disconnect", () => {
-      const user = userLeave(socket.id);
+    socket.on("disconnect", async () => {
+      const user = await userLeave(socket.id);
       if (user) {
         sendRoomUsers(user);
       }

@@ -23,7 +23,7 @@ async function renameUser(io, id, username) {
   const user = await getCurrentUser(id);
   const oldUsername = user.username;
   if (user.username !== username) {
-    user.username = username;
+    await redisClient.hSet(`user:${id}`, "username", username);
     io.to(user.room).emit(
       "message",
       formatMessage("info", `(${oldUsername}) has changed their name to (${username})`)
@@ -32,9 +32,10 @@ async function renameUser(io, id, username) {
 }
 
 // User leaves chat
-function userLeave(id) {
-  // No need to await here
+async function userLeave(id) {
+  const user = await getCurrentUser(id);
   redisClient.del(`user:${id}`);
+  return user;
 }
 
 // Get room users
