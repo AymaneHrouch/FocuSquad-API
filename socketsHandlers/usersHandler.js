@@ -26,7 +26,7 @@ module.exports = function (io, socket) {
     sendRoomUsers(user);
 
     // Notify all users in the room that a new user has joined
-    io.to(user.room).emit("message", formatMessage("🥰", `${user.username} has joined the chat`));
+    io.to(user.room).emit("message", formatMessage("info", `${user.username} has joined the chat`));
 
     // When the server gets the current/new settings, we send them to all users in the room
     socket.on("settings:res", async ({ username, session, shortBreak, longBreak, sync }) => {
@@ -51,7 +51,7 @@ module.exports = function (io, socket) {
           io.to(user.room).emit(
             "message",
             formatMessage(
-              "🥰",
+              "info",
               `(${user.username}) has updated the settings:
             ${session ? `*Session: ${session} minutes\n` : ""}
             ${shortBreak ? `*Short Break: ${shortBreak} minutes\n` : ""}

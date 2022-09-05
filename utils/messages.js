@@ -5,6 +5,7 @@ function formatMessage(username, text) {
     username,
     text,
     time,
+    info: username === "info",
   };
 }
 
