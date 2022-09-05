@@ -6,9 +6,7 @@ async function userJoin(id, username, room) {
   const user = { id, username, room };
   await redisClient.hSet(`user:${id}`, "username", username);
   await redisClient.hSet(`user:${id}`, "room", room);
-  await redisClient.sAdd(`room:${room}`, id);
   redisClient.expire(`user:${id}`, 86400);
-  redisClient.expire(`room:${room}`, 86400);
   return user;
 }
 
@@ -39,8 +37,9 @@ async function userLeave(id) {
 }
 
 // Get room users
-async function getRoomUsers(room) {
-  const usersIds = await redisClient.sMembers(`room:${room}`);
+async function getRoomUsers(io, room) {
+  // Get all users in the room
+  const usersIds = (await io.in(room).fetchSockets()).map((socket) => socket.id);
   // Promise.all is used to wait for all the promises to resolve
   const usernames = await Promise.all(
     usersIds.map(async (id) => await redisClient.hGet(`user:${id}`, "username"))
