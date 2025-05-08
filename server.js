@@ -3,6 +3,8 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 
+require('dotenv').config();
+
 const redisClient = require("./startup/redis");
 
 const app = express();
